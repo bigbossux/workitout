@@ -71,7 +71,7 @@ async function handleAnalyzeFrames(request, env) {
       frameDescriptions.push({
         frameIndex: i,
         timestamp: framesToAnalyze[i].timestamp || i * 5,
-        description: response.response || 'Could not analyze frame',
+        description: response.description || response.response || 'Could not analyze frame',
       });
     }
 
@@ -79,13 +79,13 @@ async function handleAnalyzeFrames(request, env) {
       (f, i) => `Frame ${i + 1} (${f.timestamp}s): ${f.description}`
     ).join('\n\n');
 
-    const prompt = `Based on these video frame analyses from a workout video, create a structured workout plan.
-${context ? 'Additional context: ' + context : ''}
+    const prompt = `I analyzed frames from a workout video and found these exercises:
 
-Frame analyses:
 ${combinedAnalysis}
 
-Identify all distinct exercises shown. For each exercise, determine proper form, duration/reps, and rest periods. If it looks like a circuit or HIIT workout, set appropriate cycles.`;
+${context ? 'Additional context: ' + context : ''}
+
+Create a workout from the exercises above. Each distinct exercise seen in the frames should become one exercise entry. Use 30-45 second durations and 10-15 second rest periods. If multiple exercises are shown, assume it's a circuit with 3 cycles.`;
 
     const workout = await extractWorkout(env.AI, prompt);
     return json(workout);

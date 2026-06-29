@@ -1,0 +1,14 @@
+{
+  "name": "workitout",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/worker.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "type": "module",
+  "devDependencies": {
+    "wrangler": "^4.105.0"
+  }
+}

@@ -1,0 +1,9 @@
+name = "workitout"
+main = "src/worker.js"
+compatibility_date = "2024-12-01"
+
+[vars]
+APP_NAME = "workitOut"
+
+[ai]
+binding = "AI"

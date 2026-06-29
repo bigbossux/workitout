@@ -451,6 +451,7 @@ export function getHTML() {
     const caption = $('igCaptionInput').value.trim();
     if (!caption) return;
 
+    const igUrl = pendingIgUrl;
     closeIgModal();
     $('loading').classList.add('active');
     $('errorMsg').classList.remove('active');
@@ -459,7 +460,7 @@ export function getHTML() {
       const res = await fetch('/api/parse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: pendingIgUrl, igCaption: caption }),
+        body: JSON.stringify({ source: igUrl, igCaption: caption }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -475,6 +476,11 @@ export function getHTML() {
   }
 
   function showOverview() {
+    if (!workout || !workout.exercises || !workout.exercises.length) {
+      $('errorMsg').textContent = 'Could not extract exercises from the content. Try pasting more detail.';
+      $('errorMsg').classList.add('active');
+      return;
+    }
     $('inputSection').style.display = 'none';
     $('workoutTitle').textContent = workout.title || 'Workout';
     $('workoutDesc').textContent = workout.description || '';

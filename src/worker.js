@@ -8,6 +8,14 @@ export default {
       return handleParse(request, env);
     }
 
+    if (url.pathname === '/api/analyze-frames' && request.method === 'POST') {
+      return handleAnalyzeFrames(request, env);
+    }
+
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders() });
+    }
+
     return new Response(getHTML(), {
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
@@ -16,7 +24,7 @@ export default {
 
 async function handleParse(request, env) {
   try {
-    const { source, igCaption } = await request.json();
+    const { source } = await request.json();
     if (!source || !source.trim()) {
       return json({ error: 'Please provide a URL or workout description' }, 400);
     }
@@ -25,19 +33,77 @@ async function handleParse(request, env) {
 
     if (isURL(content)) {
       if (isInstagramURL(content)) {
-        if (!igCaption || !igCaption.trim()) {
-          return json({ needsCaption: true, igUrl: content }, 200);
-        }
-        content = igCaption.trim();
-      } else {
-        content = await fetchContent(content);
+        return json({ needsCaption: true, igUrl: content }, 200);
       }
+      content = await fetchContent(content);
     }
 
     const workout = await extractWorkout(env.AI, content);
     return json(workout);
   } catch (e) {
     return json({ error: e.message || 'Failed to parse workout' }, 500);
+  }
+}
+
+async function handleAnalyzeFrames(request, env) {
+  try {
+    const { frames, context } = await request.json();
+    if (!frames || !frames.length) {
+      return json({ error: 'No frames provided' }, 400);
+    }
+
+    const frameDescriptions = [];
+    const visionModel = '@cf/meta/llama-3.2-11b-vision-instruct';
+
+    const framesToAnalyze = frames.slice(0, 6);
+
+    for (let i = 0; i < framesToAnalyze.length; i++) {
+      const frame = framesToAnalyze[i];
+      const base64 = frame.replace(/^data:image\/\w+;base64,/, '');
+      const imageBytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+
+      const response = await env.AI.run(visionModel, {
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: 'You are analyzing a frame from a workout video. Describe the exercise being performed in detail: exercise name, body position, movement phase (up/down/hold), which muscles are engaged, and any equipment used. Be specific and concise.'
+              },
+              {
+                type: 'image',
+                image: [...imageBytes],
+              }
+            ]
+          }
+        ],
+        max_tokens: 300,
+      });
+
+      frameDescriptions.push({
+        frameIndex: i,
+        timestamp: framesToAnalyze[i].timestamp || i * 5,
+        description: response.response || 'Could not analyze frame',
+      });
+    }
+
+    const combinedAnalysis = frameDescriptions.map(
+      (f, i) => `Frame ${i + 1} (${f.timestamp}s): ${f.description}`
+    ).join('\n\n');
+
+    const prompt = `Based on these video frame analyses from a workout video, create a structured workout plan.
+${context ? 'Additional context: ' + context : ''}
+
+Frame analyses:
+${combinedAnalysis}
+
+Identify all distinct exercises shown. For each exercise, determine proper form, duration/reps, and rest periods. If it looks like a circuit or HIIT workout, set appropriate cycles.`;
+
+    const workout = await extractWorkout(env.AI, prompt);
+    return json(workout);
+  } catch (e) {
+    return json({ error: e.message || 'Failed to analyze video frames' }, 500);
   }
 }
 
@@ -130,6 +196,14 @@ If the content describes a circuit/HIIT, set cycles > 1. If no explicit timing, 
   }
 
   return workout;
+}
+
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
 }
 
 function json(data, status = 200) {

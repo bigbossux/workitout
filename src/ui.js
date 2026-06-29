@@ -37,7 +37,7 @@ export function getHTML() {
     background: var(--surface);
     border-radius: var(--radius);
     padding: 20px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
   .input-section label { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 8px; }
   .input-row { display: flex; gap: 8px; }
@@ -80,12 +80,90 @@ export function getHTML() {
   }
   .btn-outline:hover { border-color: var(--text); color: var(--text); }
 
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px; color: var(--muted); font-size: 0.8rem;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: #2a2a3e;
+  }
+
+  /* Upload section */
+  .upload-section {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .upload-section label { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 12px; }
+  .upload-methods { display: flex; gap: 8px; flex-wrap: wrap; }
+  .upload-btn {
+    flex: 1;
+    min-width: 140px;
+    background: var(--surface2);
+    border: 2px dashed #2a2a3e;
+    border-radius: 8px;
+    padding: 20px 12px;
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .upload-btn:hover { border-color: var(--accent); background: #1a1a2e; }
+  .upload-btn .icon { font-size: 1.5rem; display: block; margin-bottom: 6px; }
+  .upload-btn input { display: none; }
+
+  /* Screen record */
+  .record-section { display: none; margin-bottom: 16px; }
+  .record-section.active { display: block; }
+  .record-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+  }
+  .record-status { font-size: 0.9rem; color: var(--muted); margin-bottom: 12px; }
+  .record-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    background: var(--red);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 1s ease infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .record-timer { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; margin-bottom: 16px; }
+  .record-preview { margin-top: 12px; }
+  .record-preview video {
+    width: 100%; max-height: 300px;
+    border-radius: 8px; background: #000;
+  }
+
+  /* Frame preview */
+  .frames-preview { display: none; }
+  .frames-preview.active { display: block; }
+  .frames-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .frames-grid img {
+    width: 100%; aspect-ratio: 16/9;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid transparent;
+  }
+  .frame-count { font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; }
+
   .loading {
     text-align: center;
     padding: 48px 0;
     display: none;
   }
   .loading.active { display: block; }
+  .loading-text { color: var(--muted); font-size: 0.9rem; }
   .spinner {
     width: 40px; height: 40px;
     border: 3px solid var(--surface2);
@@ -108,7 +186,6 @@ export function getHTML() {
   }
   .error-msg.active { display: block; }
 
-  /* Workout overview */
   .workout-overview {
     background: var(--surface);
     border-radius: var(--radius);
@@ -129,7 +206,6 @@ export function getHTML() {
   }
   .meta-item strong { color: var(--accent-glow); }
 
-  /* Exercise list */
   .exercise-list { display: none; margin-bottom: 16px; }
   .exercise-list.active { display: block; }
   .exercise-card {
@@ -170,7 +246,6 @@ export function getHTML() {
   .ex-timing { text-align: right; font-size: 0.85rem; color: var(--muted); flex-shrink: 0; }
   .ex-timing strong { display: block; color: var(--text); font-size: 1rem; }
 
-  /* Timer screen */
   .timer-screen {
     display: none;
     text-align: center;
@@ -206,16 +281,8 @@ export function getHTML() {
     font-weight: 800;
     font-variant-numeric: tabular-nums;
   }
-  .timer-cycle {
-    font-size: 0.9rem;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-  .timer-progress-text {
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 20px;
-  }
+  .timer-cycle { font-size: 0.9rem; color: var(--muted); margin-bottom: 8px; }
+  .timer-progress-text { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; }
   .timer-controls { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
   .timer-form-guide {
     background: var(--surface);
@@ -226,16 +293,7 @@ export function getHTML() {
   }
   .timer-form-guide h4 { font-size: 0.85rem; color: var(--accent-glow); margin-bottom: 8px; }
   .timer-form-guide p { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
-  .timer-form-guide .guide-img {
-    width: 100%;
-    max-height: 200px;
-    object-fit: contain;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    background: var(--surface2);
-  }
 
-  /* Done screen */
   .done-screen { display: none; text-align: center; padding: 48px 0; }
   .done-screen.active { display: block; }
   .done-screen h2 { font-size: 2rem; margin-bottom: 8px; }
@@ -252,56 +310,10 @@ export function getHTML() {
   .done-stat .val { font-size: 1.5rem; font-weight: 800; color: var(--green); }
   .done-stat .label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
 
-  /* Instagram viewer */
-  .ig-viewer { display: none; }
-  .ig-viewer.active { display: block; }
-  .ig-embed-wrap {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 16px;
-    text-align: center;
-    min-height: 400px;
-  }
-  .ig-embed-wrap iframe { border: none; border-radius: 8px; max-width: 100%; }
-  .ig-describe {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 20px;
-  }
-  .ig-describe h3 { margin-bottom: 4px; font-size: 1.1rem; }
-  .ig-describe p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; line-height: 1.5; }
-  .ig-describe textarea {
-    width: 100%;
-    min-height: 100px;
-    background: var(--surface2);
-    border: 1px solid #2a2a3e;
-    border-radius: 8px;
-    padding: 12px;
-    color: var(--text);
-    font-size: 0.9rem;
-    resize: vertical;
-    outline: none;
-    font-family: inherit;
-  }
-  .ig-describe textarea:focus { border-color: var(--accent); }
-  .ig-describe-actions { display: flex; gap: 8px; margin-top: 12px; }
-  .ig-templates { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-  .ig-tpl-btn {
-    background: var(--surface2);
-    border: 1px solid #2a2a3e;
-    border-radius: 6px;
-    padding: 6px 12px;
-    color: var(--accent-glow);
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .ig-tpl-btn:hover { border-color: var(--accent); background: var(--accent); color: white; }
-
   @media (max-width: 480px) {
     .timer-time { font-size: 2.8rem; }
     .timer-circle { width: 180px; height: 180px; }
+    .upload-methods { flex-direction: column; }
   }
 </style>
 </head>
@@ -309,20 +321,67 @@ export function getHTML() {
 <div class="container">
   <header>
     <h1>workit<span>Out</span></h1>
-    <p>Paste a URL or describe a workout — get a guided timer</p>
+    <p>Paste a link, upload a video, or describe your workout</p>
   </header>
 
-  <div class="input-section" id="inputSection">
-    <label>Instagram video URL, article link, or describe your workout</label>
-    <div class="input-row">
-      <input type="text" id="sourceInput" placeholder="Paste workout text, article URL, or describe: '4 rounds: 20 pushups, 30s plank'" />
-      <button id="parseBtn" onclick="parseWorkout()">Go</button>
+  <div id="inputArea">
+    <div class="input-section" id="inputSection">
+      <label>Paste a URL or describe the workout</label>
+      <div class="input-row">
+        <input type="text" id="sourceInput" placeholder="Article URL or describe: '4 rounds: 20 pushups, 30s plank, 15 squats'" />
+        <button id="parseBtn" onclick="parseWorkout()">Go</button>
+      </div>
+    </div>
+
+    <div class="divider">or</div>
+
+    <div class="upload-section" id="uploadSection">
+      <label>Upload a workout video or screenshots for AI analysis</label>
+      <div class="upload-methods">
+        <label class="upload-btn" id="videoUploadBtn">
+          <span class="icon">&#127909;</span>
+          Upload Video
+          <input type="file" id="videoInput" accept="video/*" onchange="handleVideoUpload(event)" />
+        </label>
+        <label class="upload-btn" id="imageUploadBtn">
+          <span class="icon">&#128247;</span>
+          Upload Screenshots
+          <input type="file" id="imageInput" accept="image/*" multiple onchange="handleImageUpload(event)" />
+        </label>
+        <div class="upload-btn" id="screenRecordBtn" onclick="startScreenRecord()">
+          <span class="icon">&#128308;</span>
+          Record Screen
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="record-section" id="recordSection">
+    <div class="record-card">
+      <div class="record-status"><span class="record-dot"></span>Recording screen...</div>
+      <div class="record-timer" id="recordTimer">0:00</div>
+      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px;">Play the workout video on Instagram or any app, then stop when done.</p>
+      <div style="display:flex;gap:8px;justify-content:center;">
+        <button class="btn-red btn-sm" onclick="stopScreenRecord()">Stop Recording</button>
+        <button class="btn-outline btn-sm" onclick="cancelScreenRecord()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="frames-preview" id="framesPreview">
+    <div class="record-card" style="background:var(--surface);border-radius:var(--radius);padding:20px;">
+      <div class="frame-count" id="frameCount"></div>
+      <div class="frames-grid" id="framesGrid"></div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
+        <button class="btn-green" id="analyzeBtn" onclick="analyzeFrames()">Analyze with AI</button>
+        <button class="btn-outline btn-sm" onclick="resetAll()">Cancel</button>
+      </div>
     </div>
   </div>
 
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <p>Analyzing workout...</p>
+    <p class="loading-text" id="loadingText">Analyzing workout...</p>
   </div>
 
   <div class="error-msg" id="errorMsg"></div>
@@ -358,7 +417,6 @@ export function getHTML() {
       <button class="btn-sm btn-red" onclick="stopWorkout()">Stop</button>
     </div>
     <div class="timer-form-guide" id="formGuide">
-      <img class="guide-img" id="guideImg" alt="" style="display:none;" />
       <h4>Form Guide</h4>
       <p id="guideText"></p>
     </div>
@@ -366,31 +424,14 @@ export function getHTML() {
 
   <div class="done-screen" id="doneScreen">
     <h2>Workout Complete!</h2>
-    <p>Great job — you crushed it.</p>
+    <p>Great job.</p>
     <div class="done-stats" id="doneStats"></div>
     <button onclick="resetAll()">New Workout</button>
   </div>
 </div>
 
-<div class="ig-viewer" id="igViewer">
-  <div class="ig-embed-wrap" id="igEmbedWrap"></div>
-  <div class="ig-describe">
-    <h3>Describe the workout you see</h3>
-    <p>Watch the video above, then describe the exercises, reps, sets, and timing. Or pick a template to start:</p>
-    <div class="ig-templates">
-      <button class="ig-tpl-btn" onclick="fillTemplate('hiit')">HIIT Circuit</button>
-      <button class="ig-tpl-btn" onclick="fillTemplate('amrap')">AMRAP</button>
-      <button class="ig-tpl-btn" onclick="fillTemplate('emom')">EMOM</button>
-      <button class="ig-tpl-btn" onclick="fillTemplate('tabata')">Tabata</button>
-      <button class="ig-tpl-btn" onclick="fillTemplate('strength')">Strength</button>
-    </div>
-    <textarea id="igDescInput" placeholder="e.g. 4 rounds: 30s jumping jacks, 10 pushups, 20 squats, 30s plank, 15s rest between exercises"></textarea>
-    <div class="ig-describe-actions">
-      <button onclick="submitIgDesc()">Create Workout</button>
-      <button class="btn-outline btn-sm" onclick="closeIgViewer()">Cancel</button>
-    </div>
-  </div>
-</div>
+<canvas id="frameCanvas" style="display:none;"></canvas>
+<video id="hiddenVideo" style="display:none;"></video>
 
 <script>
   let workout = null;
@@ -400,20 +441,23 @@ export function getHTML() {
   let currentExIndex = 0;
   let currentPhase = 'work';
   let secondsLeft = 0;
-  let totalDuration = 0;
   let startTime = 0;
-  let pendingIgUrl = null;
+  let extractedFrames = [];
+
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let recordStartTime = 0;
+  let recordTimerInterval = null;
 
   const CIRCUMFERENCE = 2 * Math.PI * 42;
-
   const $ = id => document.getElementById(id);
 
+  // --- URL / text parsing ---
   async function parseWorkout() {
     const source = $('sourceInput').value.trim();
     if (!source) return;
 
-    $('loading').classList.add('active');
-    $('errorMsg').classList.remove('active');
+    showLoading('Analyzing workout...');
     $('parseBtn').disabled = true;
 
     try {
@@ -425,16 +469,17 @@ export function getHTML() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       if (data.needsCaption) {
-        showIgViewer(data.igUrl);
+        hideLoading();
+        $('parseBtn').disabled = false;
+        showError('Instagram videos need to be recorded or uploaded. Use "Record Screen" to capture the video while playing it on Instagram, or upload a screen recording.');
         return;
       }
       workout = data;
       showOverview();
     } catch (e) {
-      $('errorMsg').textContent = e.message;
-      $('errorMsg').classList.add('active');
+      showError(e.message);
     } finally {
-      $('loading').classList.remove('active');
+      hideLoading();
       $('parseBtn').disabled = false;
     }
   }
@@ -443,79 +488,211 @@ export function getHTML() {
     if (e.key === 'Enter') parseWorkout();
   });
 
-  const TEMPLATES = {
-    hiit: '4 rounds, 15s rest between exercises:\n- 40s jumping jacks\n- 30s pushups\n- 40s squats\n- 30s mountain climbers\n- 40s burpees\n60s rest between rounds',
-    amrap: 'AMRAP 20 minutes:\n- 10 pushups\n- 15 squats\n- 20 sit-ups\n- 10 lunges each leg\n- 5 burpees',
-    emom: 'EMOM 16 minutes (alternate):\nOdd minutes: 15 kettlebell swings\nEven minutes: 10 pushups + 10 squats',
-    tabata: '8 rounds Tabata (20s work / 10s rest):\n- Round 1-2: squats\n- Round 3-4: pushups\n- Round 5-6: lunges\n- Round 7-8: burpees',
-    strength: '4 sets, 60s rest between sets:\n- 12 dumbbell squats\n- 10 dumbbell rows each arm\n- 12 dumbbell lunges\n- 10 dumbbell shoulder press\n- 15 dumbbell deadlifts',
-  };
+  // --- Video upload ---
+  function handleVideoUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    extractFramesFromFile(file);
+  }
 
-  function showIgViewer(igUrl) {
-    pendingIgUrl = igUrl;
-    $('inputSection').style.display = 'none';
-    $('igViewer').classList.add('active');
+  function handleImageUpload(e) {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
 
-    const shortcode = igUrl.match(/\/(p|reel|tv)\/([A-Za-z0-9_-]+)/);
-    if (shortcode) {
-      const embedUrl = 'https://www.instagram.com/' + shortcode[1] + '/' + shortcode[2] + '/embed/';
-      $('igEmbedWrap').innerHTML =
-        '<iframe src="' + embedUrl + '" width="100%" height="480" frameborder="0" scrolling="no" allowtransparency="true"></iframe>';
-    } else {
-      $('igEmbedWrap').innerHTML = '<p style="color:var(--muted);padding:40px;">Could not embed this post. <a href="' + esc(igUrl) + '" target="_blank" style="color:var(--accent);">Open in Instagram</a> to watch the video.</p>';
+    extractedFrames = [];
+    let loaded = 0;
+
+    files.forEach((file, i) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        extractedFrames.push(reader.result);
+        loaded++;
+        if (loaded === files.length) showFramesPreview();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function extractFramesFromFile(file) {
+    showLoading('Extracting frames from video...');
+    hideInputArea();
+
+    const video = $('hiddenVideo');
+    const url = URL.createObjectURL(file);
+    video.src = url;
+
+    video.onloadedmetadata = () => {
+      video.currentTime = 0;
+    };
+
+    video.onloadeddata = () => {
+      const duration = video.duration;
+      const frameCount = Math.min(6, Math.max(3, Math.floor(duration / 5)));
+      const interval = duration / (frameCount + 1);
+      const frames = [];
+      let captured = 0;
+
+      function captureFrame() {
+        const canvas = $('frameCanvas');
+        canvas.width = Math.min(video.videoWidth, 640);
+        canvas.height = Math.min(video.videoHeight, 480);
+        const scale = Math.min(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
+        const w = video.videoWidth * scale;
+        const h = video.videoHeight * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+        frames.push(canvas.toDataURL('image/jpeg', 0.8));
+        captured++;
+
+        if (captured < frameCount) {
+          video.currentTime = interval * (captured + 1);
+        } else {
+          URL.revokeObjectURL(url);
+          extractedFrames = frames;
+          hideLoading();
+          showFramesPreview();
+        }
+      }
+
+      video.onseeked = captureFrame;
+      video.currentTime = interval;
+    };
+
+    video.onerror = () => {
+      URL.revokeObjectURL(url);
+      hideLoading();
+      showInputArea();
+      showError('Could not read the video file. Try a different format or upload screenshots instead.');
+    };
+  }
+
+  // --- Screen recording ---
+  async function startScreenRecord() {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { mediaSource: 'screen' },
+        audio: false,
+      });
+
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(stream, { mimeType: getSupportedMime() });
+
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        clearInterval(recordTimerInterval);
+
+        if (recordedChunks.length === 0) {
+          showInputArea();
+          return;
+        }
+
+        const blob = new Blob(recordedChunks, { type: recordedChunks[0].type });
+        extractFramesFromFile(blob);
+      };
+
+      stream.getVideoTracks()[0].onended = () => {
+        if (mediaRecorder.state === 'recording') mediaRecorder.stop();
+      };
+
+      mediaRecorder.start(1000);
+      recordStartTime = Date.now();
+      hideInputArea();
+      $('recordSection').classList.add('active');
+      updateRecordTimer();
+      recordTimerInterval = setInterval(updateRecordTimer, 1000);
+
+    } catch (e) {
+      if (e.name !== 'NotAllowedError') {
+        showError('Screen recording failed: ' + e.message);
+      }
     }
-
-    $('igDescInput').value = '';
-    $('igDescInput').focus();
   }
 
-  function fillTemplate(key) {
-    $('igDescInput').value = TEMPLATES[key] || '';
-    $('igDescInput').focus();
+  function getSupportedMime() {
+    const types = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'];
+    return types.find(t => MediaRecorder.isTypeSupported(t)) || '';
   }
 
-  function closeIgViewer() {
-    $('igViewer').classList.remove('active');
-    $('igEmbedWrap').innerHTML = '';
-    $('igDescInput').value = '';
-    $('inputSection').style.display = '';
-    pendingIgUrl = null;
+  function updateRecordTimer() {
+    const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
+    const min = Math.floor(elapsed / 60);
+    const sec = String(elapsed % 60).padStart(2, '0');
+    $('recordTimer').textContent = min + ':' + sec;
   }
 
-  async function submitIgDesc() {
-    const desc = $('igDescInput').value.trim();
-    if (!desc) return;
+  function stopScreenRecord() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+    }
+    $('recordSection').classList.remove('active');
+  }
 
-    $('igViewer').classList.remove('active');
-    $('loading').classList.add('active');
-    $('errorMsg').classList.remove('active');
+  function cancelScreenRecord() {
+    recordedChunks = [];
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+    }
+    clearInterval(recordTimerInterval);
+    $('recordSection').classList.remove('active');
+    showInputArea();
+  }
+
+  // --- Frame preview + analysis ---
+  function showFramesPreview() {
+    $('frameCount').textContent = extractedFrames.length + ' frames captured — ready for AI analysis';
+    $('framesGrid').innerHTML = extractedFrames.map(
+      f => '<img src="' + f + '" />'
+    ).join('');
+    $('framesPreview').classList.add('active');
+  }
+
+  async function analyzeFrames() {
+    showLoading('AI is analyzing ' + extractedFrames.length + ' frames...');
+    $('framesPreview').classList.remove('active');
 
     try {
-      const res = await fetch('/api/parse', {
+      const res = await fetch('/api/analyze-frames', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: desc }),
+        body: JSON.stringify({ frames: extractedFrames }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       workout = data;
       showOverview();
     } catch (e) {
-      $('errorMsg').textContent = e.message;
-      $('errorMsg').classList.add('active');
-      $('igViewer').classList.add('active');
+      showError(e.message);
+      $('framesPreview').classList.add('active');
     } finally {
-      $('loading').classList.remove('active');
+      hideLoading();
     }
   }
 
+  // --- UI helpers ---
+  function showLoading(text) {
+    $('loadingText').textContent = text || 'Analyzing workout...';
+    $('loading').classList.add('active');
+    $('errorMsg').classList.remove('active');
+  }
+  function hideLoading() { $('loading').classList.remove('active'); }
+  function showError(msg) {
+    $('errorMsg').textContent = msg;
+    $('errorMsg').classList.add('active');
+  }
+  function hideInputArea() { $('inputArea').style.display = 'none'; }
+  function showInputArea() { $('inputArea').style.display = ''; }
+
+  // --- Workout overview ---
   function showOverview() {
     if (!workout || !workout.exercises || !workout.exercises.length) {
-      $('errorMsg').textContent = 'Could not extract exercises from the content. Try pasting more detail.';
-      $('errorMsg').classList.add('active');
+      showError('Could not extract exercises. Try uploading a clearer video or more screenshots.');
       return;
     }
-    $('inputSection').style.display = 'none';
+    hideInputArea();
     $('workoutTitle').textContent = workout.title || 'Workout';
     $('workoutDesc').textContent = workout.description || '';
 
@@ -548,6 +725,7 @@ export function getHTML() {
     $('exerciseList').classList.add('active');
   }
 
+  // --- Timer ---
   function startWorkout() {
     currentCycle = 0;
     currentExIndex = 0;
@@ -569,13 +747,9 @@ export function getHTML() {
 
   function tick() {
     if (paused) return;
-    if (secondsLeft <= 0) {
-      advance();
-      return;
-    }
+    if (secondsLeft <= 0) { advance(); return; }
     secondsLeft--;
     updateTimerDisplay();
-
     if (secondsLeft <= 3 && secondsLeft > 0) beep(660, 80);
     if (secondsLeft === 0) beep(880, 200);
   }
@@ -605,10 +779,7 @@ export function getHTML() {
     currentExIndex++;
     if (currentExIndex >= exercises.length) {
       currentCycle++;
-      if (currentCycle >= cycles) {
-        finishWorkout();
-        return;
-      }
+      if (currentCycle >= cycles) { finishWorkout(); return; }
       currentExIndex = 0;
     }
 
@@ -633,9 +804,7 @@ export function getHTML() {
 
     const cycles = workout.cycles || 1;
     $('timerCycle').textContent = 'Cycle ' + (currentCycle + 1) + ' / ' + cycles;
-
-    const total = workout.exercises.length;
-    $('timerProgressText').textContent = 'Exercise ' + (currentExIndex + 1) + ' of ' + total;
+    $('timerProgressText').textContent = 'Exercise ' + (currentExIndex + 1) + ' of ' + workout.exercises.length;
 
     const maxTime = currentPhase === 'work' ? (ex ? ex.duration : 1) :
                     currentPhase === 'rest' ? (ex ? ex.rest : 1) : 5;
@@ -650,15 +819,6 @@ export function getHTML() {
     const ex = workout.exercises[currentExIndex];
     if (!ex) return;
     $('guideText').textContent = ex.description || 'Perform the exercise with controlled form.';
-
-    const img = $('guideImg');
-    if (ex.imageQuery) {
-      img.src = 'https://api.dicebear.com/9.x/shapes/svg?seed=' + encodeURIComponent(ex.name);
-      img.alt = ex.name;
-      img.style.display = 'block';
-    } else {
-      img.style.display = 'none';
-    }
   }
 
   function highlightCurrent() {
@@ -666,9 +826,7 @@ export function getHTML() {
       const card = $('exCard' + i);
       if (!card) return;
       card.classList.remove('current', 'done');
-      if (i < currentExIndex || (currentCycle > 0 && i < workout.exercises.length)) {
-        card.classList.add('done');
-      }
+      if (i < currentExIndex) card.classList.add('done');
       if (i === currentExIndex) card.classList.add('current');
     });
   }
@@ -678,11 +836,7 @@ export function getHTML() {
     $('pauseBtn').textContent = paused ? 'Resume' : 'Pause';
   }
 
-  function skipExercise() {
-    secondsLeft = 0;
-    if (currentPhase === 'rest') advance();
-    else advance();
-  }
+  function skipExercise() { secondsLeft = 0; advance(); }
 
   function stopWorkout() {
     clearInterval(timerInterval);
@@ -710,12 +864,15 @@ export function getHTML() {
 
   function resetAll() {
     workout = null;
+    extractedFrames = [];
     clearInterval(timerInterval);
-    ['overview', 'exerciseList', 'timerScreen', 'doneScreen', 'loading', 'errorMsg', 'igViewer'].forEach(id => {
+    ['overview', 'exerciseList', 'timerScreen', 'doneScreen', 'loading', 'errorMsg', 'framesPreview', 'recordSection'].forEach(id => {
       $(id).classList.remove('active');
     });
-    $('inputSection').style.display = '';
+    showInputArea();
     $('sourceInput').value = '';
+    $('videoInput').value = '';
+    $('imageInput').value = '';
   }
 
   function esc(s) {

@@ -53,7 +53,7 @@ async function handleAnalyzeFrames(request, env) {
     }
 
     const frameDescriptions = [];
-    const visionModel = '@cf/meta/llama-3.2-11b-vision-instruct';
+    const visionModel = '@cf/llava-hf/llava-1.5-7b-hf';
 
     const framesToAnalyze = frames.slice(0, 6);
 

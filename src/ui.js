@@ -252,37 +252,28 @@ export function getHTML() {
   .done-stat .val { font-size: 1.5rem; font-weight: 800; color: var(--green); }
   .done-stat .label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
 
-  /* Instagram caption modal */
-  .ig-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
-  .ig-modal.active { display: flex; }
-  .ig-modal-content {
+  /* Instagram viewer */
+  .ig-viewer { display: none; }
+  .ig-viewer.active { display: block; }
+  .ig-embed-wrap {
     background: var(--surface);
     border-radius: var(--radius);
-    padding: 24px;
-    max-width: 500px;
-    width: 100%;
-  }
-  .ig-modal-content h3 { margin-bottom: 8px; }
-  .ig-modal-content .ig-steps {
-    color: var(--muted);
-    font-size: 0.85rem;
-    line-height: 1.6;
+    padding: 16px;
     margin-bottom: 16px;
+    text-align: center;
+    min-height: 400px;
   }
-  .ig-modal-content .ig-steps ol { padding-left: 20px; }
-  .ig-modal-content .ig-steps li { margin-bottom: 4px; }
-  .ig-modal-content textarea {
+  .ig-embed-wrap iframe { border: none; border-radius: 8px; max-width: 100%; }
+  .ig-describe {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .ig-describe h3 { margin-bottom: 4px; font-size: 1.1rem; }
+  .ig-describe p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; line-height: 1.5; }
+  .ig-describe textarea {
     width: 100%;
-    min-height: 120px;
+    min-height: 100px;
     background: var(--surface2);
     border: 1px solid #2a2a3e;
     border-radius: 8px;
@@ -293,8 +284,20 @@ export function getHTML() {
     outline: none;
     font-family: inherit;
   }
-  .ig-modal-content textarea:focus { border-color: var(--accent); }
-  .ig-modal-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .ig-describe textarea:focus { border-color: var(--accent); }
+  .ig-describe-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .ig-templates { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .ig-tpl-btn {
+    background: var(--surface2);
+    border: 1px solid #2a2a3e;
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: var(--accent-glow);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ig-tpl-btn:hover { border-color: var(--accent); background: var(--accent); color: white; }
 
   @media (max-width: 480px) {
     .timer-time { font-size: 2.8rem; }
@@ -369,21 +372,22 @@ export function getHTML() {
   </div>
 </div>
 
-<div class="ig-modal" id="igModal">
-  <div class="ig-modal-content">
-    <h3>Instagram Post Detected</h3>
-    <div class="ig-steps">
-      <ol>
-        <li>Open the Instagram post in your browser</li>
-        <li>Find the caption text below the video/image</li>
-        <li>Select all the caption text and copy it</li>
-        <li>Paste it in the box below</li>
-      </ol>
+<div class="ig-viewer" id="igViewer">
+  <div class="ig-embed-wrap" id="igEmbedWrap"></div>
+  <div class="ig-describe">
+    <h3>Describe the workout you see</h3>
+    <p>Watch the video above, then describe the exercises, reps, sets, and timing. Or pick a template to start:</p>
+    <div class="ig-templates">
+      <button class="ig-tpl-btn" onclick="fillTemplate('hiit')">HIIT Circuit</button>
+      <button class="ig-tpl-btn" onclick="fillTemplate('amrap')">AMRAP</button>
+      <button class="ig-tpl-btn" onclick="fillTemplate('emom')">EMOM</button>
+      <button class="ig-tpl-btn" onclick="fillTemplate('tabata')">Tabata</button>
+      <button class="ig-tpl-btn" onclick="fillTemplate('strength')">Strength</button>
     </div>
-    <textarea id="igCaptionInput" placeholder="Paste the Instagram caption here..."></textarea>
-    <div class="ig-modal-actions">
-      <button onclick="submitIgCaption()">Parse Workout</button>
-      <button class="btn-outline btn-sm" onclick="closeIgModal()">Cancel</button>
+    <textarea id="igDescInput" placeholder="e.g. 4 rounds: 30s jumping jacks, 10 pushups, 20 squats, 30s plank, 15s rest between exercises"></textarea>
+    <div class="ig-describe-actions">
+      <button onclick="submitIgDesc()">Create Workout</button>
+      <button class="btn-outline btn-sm" onclick="closeIgViewer()">Cancel</button>
     </div>
   </div>
 </div>
@@ -421,9 +425,7 @@ export function getHTML() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       if (data.needsCaption) {
-        pendingIgUrl = data.igUrl;
-        $('igModal').classList.add('active');
-        $('igCaptionInput').focus();
+        showIgViewer(data.igUrl);
         return;
       }
       workout = data;
@@ -441,18 +443,50 @@ export function getHTML() {
     if (e.key === 'Enter') parseWorkout();
   });
 
-  function closeIgModal() {
-    $('igModal').classList.remove('active');
-    $('igCaptionInput').value = '';
+  const TEMPLATES = {
+    hiit: '4 rounds, 15s rest between exercises:\n- 40s jumping jacks\n- 30s pushups\n- 40s squats\n- 30s mountain climbers\n- 40s burpees\n60s rest between rounds',
+    amrap: 'AMRAP 20 minutes:\n- 10 pushups\n- 15 squats\n- 20 sit-ups\n- 10 lunges each leg\n- 5 burpees',
+    emom: 'EMOM 16 minutes (alternate):\nOdd minutes: 15 kettlebell swings\nEven minutes: 10 pushups + 10 squats',
+    tabata: '8 rounds Tabata (20s work / 10s rest):\n- Round 1-2: squats\n- Round 3-4: pushups\n- Round 5-6: lunges\n- Round 7-8: burpees',
+    strength: '4 sets, 60s rest between sets:\n- 12 dumbbell squats\n- 10 dumbbell rows each arm\n- 12 dumbbell lunges\n- 10 dumbbell shoulder press\n- 15 dumbbell deadlifts',
+  };
+
+  function showIgViewer(igUrl) {
+    pendingIgUrl = igUrl;
+    $('inputSection').style.display = 'none';
+    $('igViewer').classList.add('active');
+
+    const shortcode = igUrl.match(/\/(p|reel|tv)\/([A-Za-z0-9_-]+)/);
+    if (shortcode) {
+      const embedUrl = 'https://www.instagram.com/' + shortcode[1] + '/' + shortcode[2] + '/embed/';
+      $('igEmbedWrap').innerHTML =
+        '<iframe src="' + embedUrl + '" width="100%" height="480" frameborder="0" scrolling="no" allowtransparency="true"></iframe>';
+    } else {
+      $('igEmbedWrap').innerHTML = '<p style="color:var(--muted);padding:40px;">Could not embed this post. <a href="' + esc(igUrl) + '" target="_blank" style="color:var(--accent);">Open in Instagram</a> to watch the video.</p>';
+    }
+
+    $('igDescInput').value = '';
+    $('igDescInput').focus();
+  }
+
+  function fillTemplate(key) {
+    $('igDescInput').value = TEMPLATES[key] || '';
+    $('igDescInput').focus();
+  }
+
+  function closeIgViewer() {
+    $('igViewer').classList.remove('active');
+    $('igEmbedWrap').innerHTML = '';
+    $('igDescInput').value = '';
+    $('inputSection').style.display = '';
     pendingIgUrl = null;
   }
 
-  async function submitIgCaption() {
-    const caption = $('igCaptionInput').value.trim();
-    if (!caption) return;
+  async function submitIgDesc() {
+    const desc = $('igDescInput').value.trim();
+    if (!desc) return;
 
-    const igUrl = pendingIgUrl;
-    closeIgModal();
+    $('igViewer').classList.remove('active');
     $('loading').classList.add('active');
     $('errorMsg').classList.remove('active');
 
@@ -460,7 +494,7 @@ export function getHTML() {
       const res = await fetch('/api/parse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: igUrl, igCaption: caption }),
+        body: JSON.stringify({ source: desc }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -469,9 +503,9 @@ export function getHTML() {
     } catch (e) {
       $('errorMsg').textContent = e.message;
       $('errorMsg').classList.add('active');
+      $('igViewer').classList.add('active');
     } finally {
       $('loading').classList.remove('active');
-      pendingIgUrl = null;
     }
   }
 
@@ -677,7 +711,7 @@ export function getHTML() {
   function resetAll() {
     workout = null;
     clearInterval(timerInterval);
-    ['overview', 'exerciseList', 'timerScreen', 'doneScreen', 'loading', 'errorMsg'].forEach(id => {
+    ['overview', 'exerciseList', 'timerScreen', 'doneScreen', 'loading', 'errorMsg', 'igViewer'].forEach(id => {
       $(id).classList.remove('active');
     });
     $('inputSection').style.display = '';

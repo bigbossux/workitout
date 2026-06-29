@@ -63,21 +63,8 @@ async function handleAnalyzeFrames(request, env) {
       const imageBytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
 
       const response = await env.AI.run(visionModel, {
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: 'You are analyzing a frame from a workout video. Describe the exercise being performed in detail: exercise name, body position, movement phase (up/down/hold), which muscles are engaged, and any equipment used. Be specific and concise.'
-              },
-              {
-                type: 'image',
-                image: [...imageBytes],
-              }
-            ]
-          }
-        ],
+        image: [...imageBytes],
+        prompt: 'You are analyzing a frame from a workout video. Describe the exercise being performed in detail: exercise name, body position, movement phase (up/down/hold), which muscles are engaged, and any equipment used. Be specific and concise.',
         max_tokens: 300,
       });
 

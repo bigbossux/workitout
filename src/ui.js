@@ -268,7 +268,7 @@ export function getHTML() {
   <div class="input-section" id="inputSection">
     <label>Instagram video URL, article link, or describe your workout</label>
     <div class="input-row">
-      <input type="text" id="sourceInput" placeholder="https://instagram.com/p/... or '4 rounds: 20 pushups, 30s plank, 15 squats'" />
+      <input type="text" id="sourceInput" placeholder="Paste workout text, article URL, or describe: '4 rounds: 20 pushups, 30s plank'" />
       <button id="parseBtn" onclick="parseWorkout()">Go</button>
     </div>
   </div>

@@ -24,6 +24,11 @@ async function handleParse(request, env) {
     let content = source.trim();
 
     if (isURL(content)) {
+      if (isInstagramURL(content)) {
+        return json({
+          error: 'Instagram blocks automated access. Please copy the workout description from the post and paste it here instead.'
+        }, 422);
+      }
       content = await fetchContent(content);
     }
 
@@ -43,16 +48,31 @@ function isURL(str) {
   }
 }
 
+function isInstagramURL(str) {
+  try {
+    const host = new URL(str).hostname.replace('www.', '');
+    return host === 'instagram.com' || host === 'instagr.am';
+  } catch {
+    return false;
+  }
+}
+
 async function fetchContent(url) {
   const res = await fetch(url, {
     headers: {
-      'User-Agent': 'Mozilla/5.0 (compatible; workitOut/1.0)',
-      'Accept': 'text/html,application/xhtml+xml,*/*',
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
     },
     redirect: 'follow',
   });
 
-  if (!res.ok) throw new Error(`Could not fetch URL (${res.status})`);
+  if (!res.ok) {
+    if (res.status === 429 || res.status === 403) {
+      throw new Error('This site blocks automated access. Please copy the workout text and paste it here directly.');
+    }
+    throw new Error(`Could not fetch URL (${res.status})`);
+  }
 
   const html = await res.text();
   return html

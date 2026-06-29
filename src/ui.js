@@ -252,6 +252,50 @@ export function getHTML() {
   .done-stat .val { font-size: 1.5rem; font-weight: 800; color: var(--green); }
   .done-stat .label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
 
+  /* Instagram caption modal */
+  .ig-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .ig-modal.active { display: flex; }
+  .ig-modal-content {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 500px;
+    width: 100%;
+  }
+  .ig-modal-content h3 { margin-bottom: 8px; }
+  .ig-modal-content .ig-steps {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .ig-modal-content .ig-steps ol { padding-left: 20px; }
+  .ig-modal-content .ig-steps li { margin-bottom: 4px; }
+  .ig-modal-content textarea {
+    width: 100%;
+    min-height: 120px;
+    background: var(--surface2);
+    border: 1px solid #2a2a3e;
+    border-radius: 8px;
+    padding: 12px;
+    color: var(--text);
+    font-size: 0.9rem;
+    resize: vertical;
+    outline: none;
+    font-family: inherit;
+  }
+  .ig-modal-content textarea:focus { border-color: var(--accent); }
+  .ig-modal-actions { display: flex; gap: 8px; margin-top: 12px; }
+
   @media (max-width: 480px) {
     .timer-time { font-size: 2.8rem; }
     .timer-circle { width: 180px; height: 180px; }
@@ -325,6 +369,25 @@ export function getHTML() {
   </div>
 </div>
 
+<div class="ig-modal" id="igModal">
+  <div class="ig-modal-content">
+    <h3>Instagram Post Detected</h3>
+    <div class="ig-steps">
+      <ol>
+        <li>Open the Instagram post in your browser</li>
+        <li>Find the caption text below the video/image</li>
+        <li>Select all the caption text and copy it</li>
+        <li>Paste it in the box below</li>
+      </ol>
+    </div>
+    <textarea id="igCaptionInput" placeholder="Paste the Instagram caption here..."></textarea>
+    <div class="ig-modal-actions">
+      <button onclick="submitIgCaption()">Parse Workout</button>
+      <button class="btn-outline btn-sm" onclick="closeIgModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
   let workout = null;
   let timerInterval = null;
@@ -335,6 +398,7 @@ export function getHTML() {
   let secondsLeft = 0;
   let totalDuration = 0;
   let startTime = 0;
+  let pendingIgUrl = null;
 
   const CIRCUMFERENCE = 2 * Math.PI * 42;
 
@@ -356,6 +420,12 @@ export function getHTML() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
+      if (data.needsCaption) {
+        pendingIgUrl = data.igUrl;
+        $('igModal').classList.add('active');
+        $('igCaptionInput').focus();
+        return;
+      }
       workout = data;
       showOverview();
     } catch (e) {
@@ -370,6 +440,39 @@ export function getHTML() {
   $('sourceInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') parseWorkout();
   });
+
+  function closeIgModal() {
+    $('igModal').classList.remove('active');
+    $('igCaptionInput').value = '';
+    pendingIgUrl = null;
+  }
+
+  async function submitIgCaption() {
+    const caption = $('igCaptionInput').value.trim();
+    if (!caption) return;
+
+    closeIgModal();
+    $('loading').classList.add('active');
+    $('errorMsg').classList.remove('active');
+
+    try {
+      const res = await fetch('/api/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: pendingIgUrl, igCaption: caption }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      workout = data;
+      showOverview();
+    } catch (e) {
+      $('errorMsg').textContent = e.message;
+      $('errorMsg').classList.add('active');
+    } finally {
+      $('loading').classList.remove('active');
+      pendingIgUrl = null;
+    }
+  }
 
   function showOverview() {
     $('inputSection').style.display = 'none';

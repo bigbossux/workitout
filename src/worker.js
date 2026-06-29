@@ -16,7 +16,7 @@ export default {
 
 async function handleParse(request, env) {
   try {
-    const { source } = await request.json();
+    const { source, igCaption } = await request.json();
     if (!source || !source.trim()) {
       return json({ error: 'Please provide a URL or workout description' }, 400);
     }
@@ -25,11 +25,13 @@ async function handleParse(request, env) {
 
     if (isURL(content)) {
       if (isInstagramURL(content)) {
-        return json({
-          error: 'Instagram blocks automated access. Please copy the workout description from the post and paste it here instead.'
-        }, 422);
+        if (!igCaption || !igCaption.trim()) {
+          return json({ needsCaption: true, igUrl: content }, 200);
+        }
+        content = igCaption.trim();
+      } else {
+        content = await fetchContent(content);
       }
-      content = await fetchContent(content);
     }
 
     const workout = await extractWorkout(env.AI, content);

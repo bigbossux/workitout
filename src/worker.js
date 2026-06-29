@@ -87,7 +87,7 @@ async function fetchContent(url) {
 }
 
 async function extractWorkout(ai, content) {
-  const response = await ai.run('@cf/meta/llama-3.1-8b-instruct', {
+  const response = await ai.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
     messages: [
       {
         role: 'system',
